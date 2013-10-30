@@ -1,6 +1,74 @@
+<<<<<<< HEAD
 
 
 
+=======
+<?php
+/**
+ * Dokuwiki installation assistance
+ *
+ * @author      Chris Smith <chris@jalakai.co.uk>
+ */
+
+if(!defined('DOKU_INC')) define('DOKU_INC',dirname(__FILE__).'/');
+if(!defined('DOKU_CONF')) define('DOKU_CONF',DOKU_INC.'conf/');
+if(!defined('DOKU_LOCAL')) define('DOKU_LOCAL',DOKU_INC.'conf/');
+
+require_once(DOKU_INC.'inc/PassHash.class.php');
+
+// check for error reporting override or set error reporting to sane values
+if (!defined('DOKU_E_LEVEL')) { error_reporting(E_ALL ^ E_NOTICE); }
+else { error_reporting(DOKU_E_LEVEL); }
+
+// kill magic quotes
+if (get_magic_quotes_gpc() && !defined('MAGIC_QUOTES_STRIPPED')) {
+    if (!empty($_GET))    remove_magic_quotes($_GET);
+    if (!empty($_POST))   remove_magic_quotes($_POST);
+    if (!empty($_COOKIE)) remove_magic_quotes($_COOKIE);
+    if (!empty($_REQUEST)) remove_magic_quotes($_REQUEST);
+    @ini_set('magic_quotes_gpc', 0);
+    define('MAGIC_QUOTES_STRIPPED',1);
+}
+if (function_exists('set_magic_quotes_runtime')) @set_magic_quotes_runtime(0);
+@ini_set('magic_quotes_sybase',0);
+
+// language strings
+require_once(DOKU_INC.'inc/lang/en/lang.php');
+if(isset($_REQUEST['l']) && !is_array($_REQUEST['l'])) {
+    $LC = preg_replace('/[^a-z\-]+/','',$_REQUEST['l']);
+}
+if(empty($LC)) $LC = 'en';
+if($LC && $LC != 'en' ) {
+    require_once(DOKU_INC.'inc/lang/'.$LC.'/lang.php');
+}
+
+// initialise variables ...
+$error = array();
+
+$dokuwiki_hash = array(
+    '2005-09-22'   => 'e33223e957b0b0a130d0520db08f8fb7',
+    '2006-03-05'   => '51295727f79ab9af309a2fd9e0b61acc',
+    '2006-03-09'   => '51295727f79ab9af309a2fd9e0b61acc',
+    '2006-11-06'   => 'b3a8af76845977c2000d85d6990dd72b',
+    '2007-05-24'   => 'd80f2740c84c4a6a791fd3c7a353536f',
+    '2007-06-26'   => 'b3ca19c7a654823144119980be73cd77',
+    '2008-05-04'   => '1e5c42eac3219d9e21927c39e3240aad',
+    '2009-02-14'   => 'ec8c04210732a14fdfce0f7f6eead865',
+    '2009-12-25'   => '993c4b2b385643efe5abf8e7010e11f4',
+    '2010-11-07'   => '7921d48195f4db21b8ead6d9bea801b8',
+    '2011-05-25'   => '4241865472edb6fa14a1227721008072',
+    '2011-11-10'   => 'b46ff19a7587966ac4df61cbab1b8b31',
+    '2012-01-25'   => '72c083c73608fc43c586901fd5dabb74',
+    '2012-09-10'   => 'eb0b3fc90056fbc12bac6f49f7764df3',
+    '2013-05-10'   => '7b62b75245f57f122d3e0f8ed7989623',
+    '2013-10-28'   => '263c76af309fbf083867c18a34ff5214',
+);
+
+
+// begin output
+header('Content-Type: text/html; charset=utf-8');
+?>
+>>>>>>> 9269d0b1fb78c217069efd497734c183df9937be
 <!DOCTYPE html>
 <html>
   <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# githubog: http://ogp.me/ns/fb/githubog#">
