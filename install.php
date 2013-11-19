@@ -61,7 +61,7 @@ $dokuwiki_hash = array(
     '2012-01-25'   => '72c083c73608fc43c586901fd5dabb74',
     '2012-09-10'   => 'eb0b3fc90056fbc12bac6f49f7764df3',
     '2013-05-10'   => '7b62b75245f57f122d3e0f8ed7989623',
-    '2013-10-28'   => '263c76af309fbf083867c18a34ff5214',
+    '2013-11-18'   => '263c76af309fbf083867c18a34ff5214',
 );
 
 
@@ -258,11 +258,104 @@ header('Content-Type: text/html; charset=utf-8');
 
 </div>
 
+<<<<<<< HEAD
+=======
+/**
+ * Print the input form
+ */
+function print_form($d){
+    global $lang;
+    global $LC;
+
+    include(DOKU_CONF.'license.php');
+
+    if(!is_array($d)) $d = array();
+    $d = array_map('htmlspecialchars',$d);
+
+    if(!isset($d['acl'])) $d['acl']=1;
+    if(!isset($d['pop'])) $d['pop']=1;
+
+    ?>
+    <form action="" method="post">
+    <input type="hidden" name="l" value="<?php echo $LC ?>" />
+    <fieldset>
+        <label for="title"><?php echo $lang['i_wikiname']?>
+        <input type="text" name="d[title]" id="title" value="<?php echo $d['title'] ?>" style="width: 20em;" />
+        </label>
+
+        <fieldset style="margin-top: 1em;">
+            <label for="acl">
+            <input type="checkbox" name="d[acl]" id="acl" <?php echo(($d['acl'] ? ' checked="checked"' : ''));?> />
+            <?php echo $lang['i_enableacl']?></label>
+
+            <fieldset id="acldep">
+                <label for="superuser"><?php echo $lang['i_superuser']?></label>
+                <input class="text" type="text" name="d[superuser]" id="superuser" value="<?php echo $d['superuser'] ?>" />
+
+                <label for="fullname"><?php echo $lang['fullname']?></label>
+                <input class="text" type="text" name="d[fullname]" id="fullname" value="<?php echo $d['fullname'] ?>" />
+
+                <label for="email"><?php echo $lang['email']?></label>
+                <input class="text" type="text" name="d[email]" id="email" value="<?php echo $d['email'] ?>" />
+
+                <label for="password"><?php echo $lang['pass']?></label>
+                <input class="text" type="password" name="d[password]" id="password" />
+
+                <label for="confirm"><?php echo $lang['passchk']?></label>
+                <input class="text" type="password" name="d[confirm]" id="confirm" />
+
+                <label for="policy"><?php echo $lang['i_policy']?></label>
+                <select class="text" name="d[policy]" id="policy">
+                    <option value="0" <?php echo ($d['policy'] == 0)?'selected="selected"':'' ?>><?php echo $lang['i_pol0']?></option>
+                    <option value="1" <?php echo ($d['policy'] == 1)?'selected="selected"':'' ?>><?php echo $lang['i_pol1']?></option>
+                    <option value="2" <?php echo ($d['policy'] == 2)?'selected="selected"':'' ?>><?php echo $lang['i_pol2']?></option>
+                </select>
+
+                <label for="allowreg">
+                    <input type="checkbox" name="d[allowreg]" id="allowreg" <?php echo(($d['allowreg'] ? ' checked="checked"' : ''));?> />
+                    <?php echo $lang['i_allowreg']?>
+                </label>
+            </fieldset>
+        </fieldset>
+
+        <fieldset>
+            <p><?php echo $lang['i_license']?></p>
+            <?php
+            array_push($license,array('name' => $lang['i_license_none'], 'url'=>''));
+            if(empty($d['license'])) $d['license'] = 'cc-by-sa';
+            foreach($license as $key => $lic){
+                echo '<label for="lic_'.$key.'">';
+                echo '<input type="radio" name="d[license]" value="'.htmlspecialchars($key).'" id="lic_'.$key.'"'.
+                     (($d['license'] === $key)?' checked="checked"':'').'>';
+                echo htmlspecialchars($lic['name']);
+                if($lic['url']) echo ' <a href="'.$lic['url'].'" target="_blank"><sup>[?]</sup></a>';
+                echo '</label>';
+            }
+            ?>
+        </fieldset>
+
+        <fieldset>
+            <p><?php echo $lang['i_pop_field']?></p>
+            <label for="pop">
+                <input type="checkbox" name="d[pop]" id="pop" <?php echo(($d['pop'] ? ' checked="checked"' : ''));?> />
+                <?php echo $lang['i_pop_label']?> <a href="http://www.dokuwiki.org/popularity" target="_blank"><sup>[?]</sup></a>
+            </label>
+        </fieldset>
+
+    </fieldset>
+    <fieldset id="process">
+        <input class="button" type="submit" name="submit" value="<?php echo $lang['btn_save']?>" />
+    </fieldset>
+    </form>
+    <?php
+}
+>>>>>>> 14b3007921f7b66fc9e3621b861a3c83e7e9093c
 
     
   </div>
 </div>
 
+<<<<<<< HEAD
       
 
       
@@ -360,6 +453,76 @@ header('Content-Type: text/html; charset=utf-8');
   </a>
   <a class="social-count js-social-count" href="/calltella/dokuwiki/stargazers">0</a>
 </div>
+=======
+/**
+ * Check validity of data
+ *
+ * @author Andreas Gohr
+ */
+function check_data(&$d){
+    static $form_default = array(
+        'title'     => '',
+        'acl'       => '1',
+        'superuser' => '',
+        'fullname'  => '',
+        'email'     => '',
+        'password'  => '',
+        'confirm'   => '',
+        'policy'    => '0',
+        'allowreg'  => '0',
+        'license'   => 'cc-by-sa'
+    );
+    global $lang;
+    global $error;
+
+    if(!is_array($d)) $d = array();
+    foreach($d as $k => $v) {
+        if(is_array($v))
+            unset($d[$k]);
+        else
+            $d[$k] = (string)$v;
+    }
+
+    //autolowercase the username
+    $d['superuser'] = isset($d['superuser']) ? strtolower($d['superuser']) : "";
+
+    $ok = false;
+
+    if(isset($_REQUEST['submit'])) {
+        $ok = true;
+
+        // check input
+        if(empty($d['title'])){
+            $error[] = sprintf($lang['i_badval'],$lang['i_wikiname']);
+            $ok      = false;
+        }
+        if(isset($d['acl'])){
+            if(!preg_match('/^[a-z0-9_]+$/',$d['superuser'])){
+                $error[] = sprintf($lang['i_badval'],$lang['i_superuser']);
+                $ok      = false;
+            }
+            if(empty($d['password'])){
+                $error[] = sprintf($lang['i_badval'],$lang['pass']);
+                $ok      = false;
+            }
+            elseif(!isset($d['confirm']) || $d['confirm'] != $d['password']){
+                $error[] = sprintf($lang['i_badval'],$lang['passchk']);
+                $ok      = false;
+            }
+            if(empty($d['fullname']) || strstr($d['fullname'],':')){
+                $error[] = sprintf($lang['i_badval'],$lang['fullname']);
+                $ok      = false;
+            }
+            if(empty($d['email']) || strstr($d['email'],':') || !strstr($d['email'],'@')){
+                $error[] = sprintf($lang['i_badval'],$lang['email']);
+                $ok      = false;
+            }
+        }
+    }
+    $d = array_merge($form_default, $d);
+    return $ok;
+}
+>>>>>>> 14b3007921f7b66fc9e3621b861a3c83e7e9093c
 
   </li>
 
@@ -455,8 +618,73 @@ header('Content-Type: text/html; charset=utf-8');
   </div>
 </div>
 
+<<<<<<< HEAD
             <div class="only-with-full-nav">
               
+=======
+EOT;
+    $output .= '$conf[\'title\'] = \''.addslashes($d['title'])."';\n";
+    $output .= '$conf[\'lang\'] = \''.addslashes($LC)."';\n";
+    $output .= '$conf[\'license\'] = \''.addslashes($d['license'])."';\n";
+    if($d['acl']){
+        $output .= '$conf[\'useacl\'] = 1'.";\n";
+        $output .= "\$conf['superuser'] = '@admin';\n";
+    }
+    if(!$d['allowreg']){
+        $output .= '$conf[\'disableactions\'] = \'register\''.";\n";
+    }
+    $ok = $ok && fileWrite(DOKU_LOCAL.'local.php',$output);
+
+    if ($d['acl']) {
+        // hash the password
+        $phash = new PassHash();
+        $pass = $phash->hash_smd5($d['password']);
+
+        // create users.auth.php
+        // --- user:SMD5password:Real Name:email:groups,comma,seperated
+        $output = join(":",array($d['superuser'], $pass, $d['fullname'], $d['email'], 'admin,user'));
+        $output = @file_get_contents(DOKU_CONF.'users.auth.php.dist')."\n$output\n";
+        $ok = $ok && fileWrite(DOKU_LOCAL.'users.auth.php', $output);
+
+        // create acl.auth.php
+        $output = <<<EOT
+# acl.auth.php
+# <?php exit()?>
+# Don't modify the lines above
+#
+# Access Control Lists
+#
+# Auto-generated by install script
+# Date: $now
+
+EOT;
+        if($d['policy'] == 2){
+            $output .=  "*               @ALL          0\n";
+            $output .=  "*               @user         8\n";
+        }elseif($d['policy'] == 1){
+            $output .=  "*               @ALL          1\n";
+            $output .=  "*               @user         8\n";
+        }else{
+            $output .=  "*               @ALL          8\n";
+        }
+        $ok = $ok && fileWrite(DOKU_LOCAL.'acl.auth.php', $output);
+    }
+
+    // enable popularity submission
+    if($d['pop']){
+        @touch(DOKU_INC.'data/cache/autosubmit.txt');
+    }
+
+    // disable auth plugins til needed
+    $output = <<<EOT
+<?php
+/*
+ * Local plugin enable/disable settings
+ *
+ * Auto-generated by install script
+ * Date: $now
+ */
+>>>>>>> 14b3007921f7b66fc9e3621b861a3c83e7e9093c
 
   
 

@@ -57,8 +57,8 @@ function toolbar_JSdefines($varname){
                 'title'  => $lang['qb_code'],
                 'icon'   => 'mono.png',
                 'key'    => 'c',
-                'open'   => "<code>",
-                'close'  => "</code>",
+                'open'   => '<code>',
+                'close'  => '</code>',
                 'block'  => false
                 ),
            array(
@@ -66,8 +66,8 @@ function toolbar_JSdefines($varname){
                 'title'  => $lang['qb_strike'],
                 'icon'   => 'strike.png',
                 'key'    => 'd',
-                'open'  => '<del>',
-                'close'   => '</del>',
+                'open'   => '<del>',
+                'close'  => '</del>',
                 'block'  => false
                 ),
 
