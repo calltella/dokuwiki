@@ -59,6 +59,9 @@ function toolbar_JSdefines($varname){
                 'key'    => 'c',
                 'open'   => '<code>',
                 'close'  => '</code>',
+                'key'    => 'm',
+                'open'   => "''",
+                'close'  => "''",
                 'block'  => false
                 ),
            array(

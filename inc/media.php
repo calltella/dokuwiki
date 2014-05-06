@@ -1804,6 +1804,7 @@ function media_resize_image($file, $ext, $w, $h=0){
     if($info == false) return $file; // that's no image - it's a spaceship!
 
     if(!$h) $h = round(($w * $info[1]) / $info[0]);
+    if(!$w) $w = round(($h * $info[0]) / $info[1]);
 
     // we wont scale up to infinity
     if($w > 2000 || $h > 2000) return $file;
@@ -2131,6 +2132,63 @@ function media_resize_imageGD($ext,$from,$from_w,$from_h,$to,$to_w,$to_h,$ofs_x=
     if($newimg) imagedestroy($newimg);
 
     return $okay;
+}
+
+/**
+ * Return other media files with the same base name
+ * but different extensions.
+ *
+ * @param string $src       - ID of media file
+ * @param array $exts       - alternative extensions to find other files for
+ * @return array            - mime type => file ID
+ *
+ * @author Anika Henke <anika@selfthinker.org>
+ */
+function media_alternativefiles($src, $exts){
+
+    $files = array();
+    list($srcExt, $srcMime) = mimetype($src);
+    $filebase = substr($src, 0, -1 * (strlen($srcExt)+1));
+
+    foreach($exts as $ext) {
+        $fileid = $filebase.'.'.$ext;
+        $file = mediaFN($fileid);
+        if(file_exists($file)) {
+            list($fileExt, $fileMime) = mimetype($file);
+            $files[$fileMime] = $fileid;
+        }
+    }
+    return $files;
+}
+
+/**
+ * Check if video/audio is supported to be embedded.
+ *
+ * @param string $src       - mimetype of media file
+ * @param string $type      - type of media files to check ('video', 'audio', or none)
+ * @return boolean
+ *
+ * @author Anika Henke <anika@selfthinker.org>
+ */
+function media_supportedav($mime, $type=NULL){
+    $supportedAudio = array(
+        'ogg' => 'audio/ogg',
+        'mp3' => 'audio/mpeg',
+        'wav' => 'audio/wav',
+    );
+    $supportedVideo = array(
+        'webm' => 'video/webm',
+        'ogv' => 'video/ogg',
+        'mp4' => 'video/mp4',
+    );
+    if ($type == 'audio') {
+        $supportedAv = $supportedAudio;
+    } elseif ($type == 'video') {
+        $supportedAv = $supportedVideo;
+    } else {
+        $supportedAv = array_merge($supportedAudio, $supportedVideo);
+    }
+    return in_array($mime, $supportedAv);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
