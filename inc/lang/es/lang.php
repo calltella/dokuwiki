@@ -35,6 +35,7 @@
  * @author Fernando <fdiezala@gmail.com>
  * @author Eloy <ej.perezgomez@gmail.com>
  * @author Antonio Castilla <antoniocastilla@trazoide.com>
+ * @author Jonathan Hernández <me@jhalicea.com>
  */
 $lang['encoding']              = 'utf-8';
 $lang['direction']             = 'ltr';
@@ -44,13 +45,13 @@ $lang['singlequoteopening']    = '‘';
 $lang['singlequoteclosing']    = '’';
 $lang['apostrophe']            = '’';
 $lang['btn_edit']              = 'Editar esta página';
-$lang['btn_source']            = 'Ver fuente';
+$lang['btn_source']            = 'Ver la fuente de esta página';
 $lang['btn_show']              = 'Ver página';
 $lang['btn_create']            = 'Crear esta página';
 $lang['btn_search']            = 'Buscar';
 $lang['btn_save']              = 'Guardar';
 $lang['btn_preview']           = 'Previsualización';
-$lang['btn_top']               = 'Ir hasta arriba';
+$lang['btn_top']               = 'Volver arriba';
 $lang['btn_newer']             = '<< más reciente';
 $lang['btn_older']             = 'menos reciente >>';
 $lang['btn_revs']              = 'Revisiones antiguas';
@@ -77,11 +78,11 @@ $lang['btn_draftdel']          = 'Eliminar borrador';
 $lang['btn_revert']            = 'Restaurar';
 $lang['btn_register']          = 'Registrarse';
 $lang['btn_apply']             = 'Aplicar';
-$lang['btn_media']             = 'Gestor de ficheros';
+$lang['btn_media']             = 'Administrador de Ficheros';
 $lang['btn_deleteuser']        = 'Elimina Mi Cuenta';
 $lang['btn_img_backto']        = 'Volver a %s';
-$lang['btn_mediaManager']      = 'Ver en el Administrador de medios';
-$lang['loggedinas']            = 'Conectado como :';
+$lang['btn_mediaManager']      = 'Ver en el administrador de ficheros';
+$lang['loggedinas']            = 'Conectado como:';
 $lang['user']                  = 'Usuario';
 $lang['pass']                  = 'Contraseña';
 $lang['newpass']               = 'Nueva contraseña';
@@ -122,7 +123,7 @@ $lang['resendpwdnouser']       = 'Lo siento, no se encuentra este usuario en nue
 $lang['resendpwdbadauth']      = 'Lo siento, este código de autenticación no es válido. Asegúrate de haber usado el enlace de confirmación entero.';
 $lang['resendpwdconfirm']      = 'Un enlace para confirmación ha sido enviado por correo electrónico.';
 $lang['resendpwdsuccess']      = 'Tu nueva contraseña ha sido enviada por correo electrónico.';
-$lang['license']               = 'Excepto donde se indique lo contrario, el contenido de esta wiki se autoriza bajo la siguiente licencia:';
+$lang['license']               = 'Excepto donde se indique lo contrario, el contenido de este wiki esta bajo la siguiente licencia:';
 $lang['licenseok']             = 'Nota: Al editar esta página, estás de acuerdo en autorizar su contenido bajo la siguiente licencia:';
 $lang['searchmedia']           = 'Buscar archivo:';
 $lang['searchmedia_in']        = 'Buscar en %s';
@@ -274,9 +275,9 @@ $lang['metaedit']              = 'Editar metadatos';
 $lang['metasaveerr']           = 'La escritura de los metadatos ha fallado';
 $lang['metasaveok']            = 'Los metadatos han sido guardados';
 $lang['img_title']             = 'Título:';
-$lang['img_caption']           = 'Epígrafe:';
+$lang['img_caption']           = 'Información: ';
 $lang['img_date']              = 'Fecha:';
-$lang['img_fname']             = 'Nombre de fichero:';
+$lang['img_fname']             = 'Nombre del archivo:';
 $lang['img_fsize']             = 'Tamaño:';
 $lang['img_artist']            = 'Fotógrafo:';
 $lang['img_copyr']             = 'Copyright:';
