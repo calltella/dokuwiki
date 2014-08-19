@@ -63,6 +63,7 @@ $dokuwiki_hash = array(
     '2013-05-10'   => '7b62b75245f57f122d3e0f8ed7989623',
     '2013-12-08'   => '263c76af309fbf083867c18a34ff5214',
     '2014-05-05'   => '263c76af309fbf083867c18a34ff5214',
+    'devel'        => 'b3ddc3f793eac8c135176e535054c00a',
 );
 
 
@@ -624,6 +625,16 @@ function check_data(&$d){
               
 =======
 EOT;
+    // add any config options set by a previous installer
+    $preset = __DIR__.'/install.conf';
+    if(file_exists($preset)){
+        $output .= "# preset config options\n";
+        $output .= file_get_contents($preset);
+        $output .= "\n\n";
+        $output .= "# options selected in installer\n";
+        @unlink($preset);
+    }
+
     $output .= '$conf[\'title\'] = \''.addslashes($d['title'])."';\n";
     $output .= '$conf[\'lang\'] = \''.addslashes($LC)."';\n";
     $output .= '$conf[\'license\'] = \''.addslashes($d['license'])."';\n";
@@ -1774,6 +1785,7 @@ EOT;
         </a>
       </div><!-- /.actions -->
 
+<<<<<<< HEAD
     </div>
         <div class="blob-wrapper data type-php js-blob-data">
         <table class="file-code file-diff">
@@ -2403,6 +2415,25 @@ EOT;
 
   </div>
 </div>
+=======
+    if(ini_get('mbstring.func_overload') != 0){
+        $error[] = $lang['i_mbfuncoverload'];
+        $ok = false;
+    }
+
+    $funcs = explode(' ','addslashes call_user_func chmod copy fgets '.
+                         'file file_exists fseek flush filesize ftell fopen '.
+                         'glob header ignore_user_abort ini_get mail mkdir '.
+                         'ob_start opendir parse_ini_file readfile realpath '.
+                         'rename rmdir serialize session_start unlink usleep '.
+                         'preg_replace file_get_contents htmlspecialchars_decode '.
+                         'spl_autoload_register stream_select fsockopen pack');
+
+    if (!function_exists('mb_substr')) {
+        $funcs[] = 'utf8_encode';
+        $funcs[] = 'utf8_decode';
+    }
+>>>>>>> origin/master
 
 <a href="#jump-to-line" rel="facebox[.linejump]" data-hotkey="l" class="js-jump-to-line" style="display:none">Jump to Line</a>
 <div id="jump-to-line" style="display:none">

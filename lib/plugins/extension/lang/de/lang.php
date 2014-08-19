@@ -6,6 +6,7 @@
  * @author H. Richard <wanderer379@t-online.de>
  * @author Joerg <scooter22@gmx.de>
  * @author Simon <st103267@stud.uni-stuttgart.de>
+ * @author Hoisl <hoisl@gmx.at>
  */
 $lang['menu']                  = 'Erweiterungen verwalten';
 $lang['tab_plugins']           = 'Installierte Plugins';
@@ -74,6 +75,7 @@ $lang['security_issue']        = '<strong>Sicherheitsproblem:</strong> %s';
 $lang['security_warning']      = '<strong>Sicherheitswarnung:</strong> %s';
 $lang['update_available']      = '<strong>Update:</strong> Version %s steht zum Download bereit.';
 $lang['wrong_folder']          = '<strong>Plugin wurde nicht korrekt installiert:</strong> Benennen Sie das Plugin-Verzeichnis "%s" in "%s" um.';
+$lang['url_change']            = '<strong>URL geändert:</strong> Die Download URL wurde seit dem letzten Download geändert. Internetadresse vor Aktualisierung der Erweiterung auf Gültigkeit prüfen.<br />Neu: %s<br />Alt: %s';
 $lang['error_badurl']          = 'URLs sollten mit http oder https beginnen';
 $lang['error_dircreate']       = 'Temporären Ordner konnte nicht erstellt werden, um Download zu empfangen';
 $lang['error_download']        = 'Download der Datei: %s nicht möglich.';
@@ -83,6 +85,6 @@ $lang['error_copy']            = 'Beim Versuch Dateien in den Ordner <em>%s</em>
 $lang['noperms']               = 'Das Erweiterungs-Verzeichnis ist schreibgeschützt';
 $lang['notplperms']            = 'Das Template-Verzeichnis ist schreibgeschützt';
 $lang['nopluginperms']         = 'Das Plugin-Verzeichnis ist schreibgeschützt';
-$lang['git']                   = 'Diese Erweiterung wurde über git installiert, daher kann diese nicht hier aktualisiert werden.';
+$lang['git']                   = 'Diese Erweiterung wurde über git installiert und sollte daher nicht hier aktualisiert werden.';
 $lang['install_url']           = 'Von Webadresse (URL) installieren';
 $lang['install_upload']        = 'Erweiterung hochladen:';
