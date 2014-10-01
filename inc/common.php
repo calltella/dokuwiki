@@ -438,6 +438,8 @@ function idfilter($id, $ue = true) {
 function wl($id = '', $urlParameters = '', $absolute = false, $separator = '&amp;') {
     global $conf;
     if(is_array($urlParameters)) {
+        if(isset($urlParameters['rev']) && !$urlParameters['rev']) unset($urlParameters['rev']);
+        if(isset($urlParameters['at']) && $conf['date_at_format']) $urlParameters['at'] = date($conf['date_at_format'],$urlParameters['at']);
         $urlParameters = buildURLparams($urlParameters, $separator);
     } else {
         $urlParameters = str_replace(',', $separator, $urlParameters);
@@ -544,6 +546,7 @@ function ml($id = '', $more = '', $direct = true, $sep = '&amp;', $abs = false) 
         if(empty($more['w'])) unset($more['w']);
         if(empty($more['h'])) unset($more['h']);
         if(isset($more['id']) && $direct) unset($more['id']);
+        if(isset($more['rev']) && !$more['rev']) unset($more['rev']);
         $more = buildURLparams($more, $sep);
     } else {
         $matches = array();
@@ -1583,7 +1586,7 @@ function shorten($keep, $short, $max, $min = 9, $char = '…') {
 }
 
 /**
- * Return the users realname or e-mail address for use
+ * Return the users real name or e-mail address for use
  * in page footer and recent changes pages
  *
  * @param string|null $username or null when currently logged-in user should be used
@@ -1641,22 +1644,20 @@ function userlink($username = null, $textonly = false) {
     $evt = new Doku_Event('COMMON_USER_LINK', $data);
     if($evt->advise_before(true)) {
         if(empty($data['name'])) {
-            if($conf['showuseras'] == 'loginname') {
-                $data['name'] = $textonly ? $data['username'] : hsc($data['username']);
-            } else {
-                if($auth) $info = $auth->getUserData($username);
-                if(isset($info) && $info) {
-                    switch($conf['showuseras']) {
-                        case 'username':
-                        case 'username_link':
-                            $data['name'] = $textonly ? $info['name'] : hsc($info['name']);
-                            break;
-                        case 'email':
-                        case 'email_link':
-                            $data['name'] = obfuscate($info['mail']);
-                            break;
-                    }
+            if($auth) $info = $auth->getUserData($username);
+            if($conf['showuseras'] != 'loginname' && isset($info) && $info) {
+                switch($conf['showuseras']) {
+                    case 'username':
+                    case 'username_link':
+                        $data['name'] = $textonly ? $info['name'] : hsc($info['name']);
+                        break;
+                    case 'email':
+                    case 'email_link':
+                        $data['name'] = obfuscate($info['mail']);
+                        break;
                 }
+            } else {
+                $data['name'] = $textonly ? $data['username'] : hsc($data['username']);
             }
         }
 

@@ -17,6 +17,8 @@
  * @author Zbyněk Křivka <krivka@fit.vutbr.cz>
  * @author Petr Klíma <qaxi@seznam.cz>
  * @author Radovan Buroň <radovan@buron.cz>
+ * @author Viktor Zavadil <vzavadil@newps.cz>
+ * @author Jaroslav Lichtblau <jlichtblau@seznam.cz>
  */
 $lang['encoding']              = 'utf-8';
 $lang['direction']             = 'ltr';
@@ -78,6 +80,7 @@ $lang['badpassconfirm']        = 'Bohužel špatné heslo';
 $lang['minoredit']             = 'Drobné změny';
 $lang['draftdate']             = 'Koncept automaticky uložen v';
 $lang['nosecedit']             = 'Stránka byla v mezičase změněna. Informace o sekci již nebylo platné, byla načtena celá stránka.';
+$lang['searchcreatepage']      = "Pokud jste nenašli, co hledáte, zkuste požadovanou stránku sami vytvořit stisknutím tlačítka ''Vytvořit stránku''.";
 $lang['regmissing']            = 'Musíte vyplnit všechny údaje.';
 $lang['reguexists']            = 'Uživatel se stejným jménem už je zaregistrován.';
 $lang['regsuccess']            = 'Uživatelský účet byl vytvořen a heslo zasláno mailem.';
@@ -194,6 +197,9 @@ $lang['difflink']              = 'Odkaz na výstup diff';
 $lang['diff_type']             = 'Zobrazit rozdíly:';
 $lang['diff_inline']           = 'Vložené';
 $lang['diff_side']             = 'Přidané';
+$lang['diffprevrev']           = 'Předchozí verze';
+$lang['diffnextrev']           = 'Následující verze';
+$lang['difflastrev']           = 'Poslední revize';
 $lang['line']                  = 'Řádek';
 $lang['breadcrumb']            = 'Historie:';
 $lang['youarehere']            = 'Umístění:';

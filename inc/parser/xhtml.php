@@ -28,6 +28,7 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
 
     /** @var array A stack of section edit data */
     protected $sectionedits = array();
+    var $date_at = '';    // link pages and media against this revision
 
     /** @var int last section edit id, used by startSectionEdit */
     protected $lastsecid = 0;
@@ -818,7 +819,7 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
         $default = $this->_simpleTitle($id);
 
         // now first resolve and clean up the $id
-        resolve_pageid(getNS($ID), $id, $exists);
+        resolve_pageid(getNS($ID), $id, $exists, $this->date_at, true);
 
         $name = $this->_getLinkTitle($name, $default, $isImage, $id, $linktype);
         if(!$isImage) {
@@ -846,11 +847,14 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
             $link['pre'] = '<span class="curid">';
             $link['suf'] = '</span>';
         }
-        $link['more']  = '';
-        $link['class'] = $class;
-        $link['url']   = wl($id, $params);
-        $link['name']  = $name;
-        $link['title'] = $id;
+        $link['more']   = '';
+        $link['class']  = $class;
+        if($this->date_at) {
+            $params['at'] = $this->date_at;
+        }
+        $link['url']    = wl($id, $params);
+        $link['name']   = $name;
+        $link['title']  = $id;
         //add search string
         if($search) {
             ($conf['userewrite']) ? $link['url'] .= '?' : $link['url'] .= '&amp;';
@@ -1062,7 +1066,7 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
                            $height = null, $cache = null, $linking = null, $return = false) {
         global $ID;
         list($src, $hash) = explode('#', $src, 2);
-        resolve_mediaid(getNS($ID), $src, $exists);
+        resolve_mediaid(getNS($ID), $src, $exists, $this->date_at, true);
 
         $noLink = false;
         $render = ($linking == 'linkonly') ? false : true;
@@ -1070,7 +1074,7 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
 
         list($ext, $mime) = mimetype($src, false);
         if(substr($mime, 0, 5) == 'image' && $render) {
-            $link['url'] = ml($src, array('id' => $ID, 'cache' => $cache), ($linking == 'direct'));
+            $link['url'] = ml($src, array('id' => $ID, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src)), ($linking == 'direct'));
         } elseif(($mime == 'application/x-shockwave-flash' || media_supportedav($mime)) && $render) {
             // don't link movies
             $noLink = true;
@@ -1078,7 +1082,7 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
             // add file icons
             $class = preg_replace('/[^_\-a-z0-9]+/i', '_', $ext);
             $link['class'] .= ' mediafile mf_'.$class;
-            $link['url'] = ml($src, array('id' => $ID, 'cache' => $cache), true);
+            $link['url'] = ml($src, array('id' => $ID, 'cache' => $cache , 'rev'=>$this->_getLastMediaRevisionAt($src)), true);
             if($exists) $link['title'] .= ' ('.filesize_h(filesize(mediaFN($src))).')';
         }
 
@@ -1109,9 +1113,10 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
      * @param int    $height  height of media in pixel
      * @param string $cache   cache|recache|nocache
      * @param string $linking linkonly|detail|nolink
+     * @param bool   $return  return HTML instead of adding to $doc
      */
     function externalmedia($src, $title = null, $align = null, $width = null,
-                           $height = null, $cache = null, $linking = null) {
+                           $height = null, $cache = null, $linking = null, $return = false) {
         list($src, $hash) = explode('#', $src, 2);
         $noLink = false;
         $render = ($linking == 'linkonly') ? false : true;
@@ -1135,8 +1140,13 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
         if($hash) $link['url'] .= '#'.$hash;
 
         //output formatted
-        if($linking == 'nolink' || $noLink) $this->doc .= $link['name'];
-        else $this->doc .= $this->_formatLink($link);
+        if($return) {
+            if($linking == 'nolink' || $noLink) return $link['name'];
+            else return $this->_formatLink($link);
+        } else {
+            if($linking == 'nolink' || $noLink) $this->doc .= $link['name'];
+            else $this->doc .= $this->_formatLink($link);
+        }
     }
 
     /**
@@ -1430,7 +1440,7 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
                 return $title;
             }
             //add image tag
-            $ret .= '<img src="'.ml($src, array('w' => $width, 'h' => $height, 'cache' => $cache)).'"';
+            $ret .= '<img src="'.ml($src, array('w' => $width, 'h' => $height, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src))).'"';
             $ret .= ' class="media'.$align.'"';
 
             if($title) {
@@ -1575,7 +1585,7 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
         // see internalmedia() and externalmedia()
         list($img['src']) = explode('#', $img['src'], 2);
         if($img['type'] == 'internalmedia') {
-            resolve_mediaid(getNS($ID), $img['src'], $exists);
+            resolve_mediaid(getNS($ID), $img['src'], $exists ,$this->date_at, true);
         }
 
         return $this->_media(
@@ -1638,13 +1648,22 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
         if(!$atts['width']) $atts['width'] = 320;
         if(!$atts['height']) $atts['height'] = 240;
 
-        // prepare alternative formats
-        $extensions   = array('webm', 'ogv', 'mp4');
-        $alternatives = media_alternativefiles($src, $extensions);
-        $poster       = media_alternativefiles($src, array('jpg', 'png'), true);
-        $posterUrl    = '';
-        if(!empty($poster)) {
-            $posterUrl = ml(reset($poster), '', true, '&');
+        $posterUrl = '';
+        $files = array();
+        $isExternal = media_isexternal($src);
+
+        if ($isExternal) {
+            // take direct source for external files
+            list(/*ext*/, $srcMime) = mimetype($src);
+            $files[$srcMime] = $src;
+        } else {
+            // prepare alternative formats
+            $extensions   = array('webm', 'ogv', 'mp4');
+            $files        = media_alternativefiles($src, $extensions);
+            $poster       = media_alternativefiles($src, array('jpg', 'png'), true);
+            if(!empty($poster)) {
+                $posterUrl = ml(reset($poster), '', true, '&');
+            }
         }
 
         $out = '';
@@ -1655,13 +1674,19 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
         $fallback = '';
 
         // output source for each alternative video format
-        foreach($alternatives as $mime => $file) {
-            $url   = ml($file, '', true, '&');
+        foreach($files as $mime => $file) {
+            if ($isExternal) {
+                $url = $file;
+                $linkType = 'externalmedia';
+            } else {
+                $url = ml($file, '', true, '&');
+                $linkType = 'internalmedia';
+            }
             $title = $atts['title'] ? $atts['title'] : $this->_xmlEntities(utf8_basename(noNS($file)));
 
             $out .= '<source src="'.hsc($url).'" type="'.$mime.'" />'.NL;
             // alternative content (just a link to the file)
-            $fallback .= $this->internalmedia($file, $title, null, null, null, $cache = null, $linking = 'linkonly', $return = true);
+            $fallback .= $this->$linkType($file, $title, null, null, null, $cache = null, $linking = 'linkonly', $return = true);
         }
 
         // finish
@@ -1680,10 +1705,18 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
      * @return string
      */
     function _audio($src, $atts = null) {
+        $files = array();
+        $isExternal = media_isexternal($src);
 
-        // prepare alternative formats
-        $extensions   = array('ogg', 'mp3', 'wav');
-        $alternatives = media_alternativefiles($src, $extensions);
+        if ($isExternal) {
+            // take direct source for external files
+            list(/*ext*/, $srcMime) = mimetype($src);
+            $files[$srcMime] = $src;
+        } else {
+            // prepare alternative formats
+            $extensions   = array('ogg', 'mp3', 'wav');
+            $files        = media_alternativefiles($src, $extensions);
+        }
 
         $out = '';
         // open audio tag
@@ -1691,19 +1724,40 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
         $fallback = '';
 
         // output source for each alternative audio format
-        foreach($alternatives as $mime => $file) {
-            $url   = ml($file, '', true, '&');
+        foreach($files as $mime => $file) {
+            if ($isExternal) {
+                $url = $file;
+                $linkType = 'externalmedia';
+            } else {
+                $url = ml($file, '', true, '&');
+                $linkType = 'internalmedia';
+            }
             $title = $atts['title'] ? $atts['title'] : $this->_xmlEntities(utf8_basename(noNS($file)));
 
             $out .= '<source src="'.hsc($url).'" type="'.$mime.'" />'.NL;
             // alternative content (just a link to the file)
-            $fallback .= $this->internalmedia($file, $title, null, null, null, $cache = null, $linking = 'linkonly', $return = true);
+            $fallback .= $this->$linkType($file, $title, null, null, null, $cache = null, $linking = 'linkonly', $return = true);
         }
 
         // finish
         $out .= $fallback;
         $out .= '</audio>'.NL;
         return $out;
+    }
+    
+    /**
+     * _getLastMediaRevisionAt is a helperfunction to internalmedia() and _media()
+     * which returns an existing media revision less or equal to rev or date_at
+     *
+     * @author lisps
+     * @param string $media_id
+     * @access protected
+     * @return string revision ('' for current)
+     */
+    function _getLastMediaRevisionAt($media_id){
+        if(!$this->date_at || media_isexternal($media_id)) return '';
+        $pagelog = new MediaChangeLog($media_id);
+        return $pagelog->getLastRevisionAt($this->date_at);
     }
 
     #endregion
